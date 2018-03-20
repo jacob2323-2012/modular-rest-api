@@ -28,9 +28,12 @@ var routes = {
 // Bind Routes
 exports = module.exports = function (app) {
     
+    // special login and report of coverage only
+    // available in debug_mode
     var debug_mode = keystone.get('debug_mode');
     if (debug_mode) {
         app.post('/api/signin', routes.api.signin);
+        app.post('/api/report', routes.api.reportCoverage);
     }
 
     app.get('\/rest\/all\/*', routes.rest.getall);
