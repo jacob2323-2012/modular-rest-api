@@ -28,7 +28,6 @@ Users.add({
     roles: Object.assign(fl.roles, { type: Types.Relationship, ref: 'roles', initial: true, required: true, many: true, filters: { isGuestRole: 'false' } }),
     canAccessKeystone: Object.assign(fl.canAccessKeystone, { type: Boolean, hidden: true })
 });
-Users.relationship({ path: 'bookmarks', ref: 'bookmarks', refPath: 'user' });
 Users.defaultColumns = 'name, email, roles';
 
 Users.schema.path('roles').set(function (newVal) {
