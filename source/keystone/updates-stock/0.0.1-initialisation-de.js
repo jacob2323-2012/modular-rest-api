@@ -34,7 +34,7 @@ exports = module.exports = function (done) {
             .concat(Base.model.createPermissions('users', ['roles_admin'])),
         users: [{
             name: { first: 'Admin', last: 'User' },
-            email: 'atrantow@web.de',
+            email: 'admin@dummydomain.de',
             password: 'admin',
             canAccessKeystone: true,
             roles: ['roles_admin'],
