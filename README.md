@@ -7,19 +7,15 @@
 ## Dependencies
 I've build this state of development with the following dependencies
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-</style>
-<table class="tg">
+
+<table style="border-style:solid;border-width:1px;border-spacing:0;">
   <tr>
-    <th class="tg-031e" width=200>Library</th>
-    <th class="tg-031e"width=200>Version</th>
+    <th width=200>Library</th>
+    <th width=200>Version</th>
   </tr>
   <tr>
-    <td class="tg-031e">NodeJS</td>
-    <td class="tg-031e">8.9.1</td>
+    <td>NodeJS</td>
+    <td >8.9.1</td>
   </tr>
   <tr>
     <td class="tg-031e">Keystone</td>
