@@ -1,8 +1,16 @@
-rem copy updates-stock/0.0.1-initialisation-en.js updates
 
-SET LOG_DIR=%~dp0\logs
+SET SCRIPT_DIR=%~dp0
+CALL %SCRIPT_DIR%\config\environment.bat
+SET MY_LOGDIR=%SCRIPT_DIR%logs
+mkdir %MY_LOGDIR%
+
+SET LOG_FILENAME_PREFIX_OUT=keystone_stdout_
+SET MY_LOGFILE_OUT=%MY_LOGDIR%\%LOG_FILENAME_PREFIX_OUT%%MY_LOGDATETIME%.log
+
+SET LOG_FILENAME_PREFIX_ERR=keystone_stderr_
+SET MY_LOGFILE_ERR=%MY_LOGDIR%\%LOG_FILENAME_PREFIX_ERR%%MY_LOGDATETIME%.log
 
 cd %~dp0source\keystone\
-node web --debug-mode --locale en > %LOG_DIR%\stdout.log 2>%LOG_DIR%\stderr.log
+node web --debug-mode --locale en > %MY_LOGFILE_OUT% 2>%MY_LOGFILE_ERR%
 cd..
 cd..

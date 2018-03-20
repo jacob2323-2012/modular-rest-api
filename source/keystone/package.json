@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "keystone": "latest",
-    "underscore": "latest"
+    "keystone": "^4.0.0-beta.8",
+    "underscore": "^1.8.3"
   },
   "engines": {
     "node": "0.10.x",
@@ -12,6 +12,8 @@
   },
   "scripts": {
     "start": "web.js"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5"
   }
-  
 }
