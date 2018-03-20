@@ -5,7 +5,7 @@
 
 
 ## Dependencies
-I've build this state of development with the following dependencies
+I've built this state of development with the following dependencies
 
 
 <table style="border-style:solid;border-width:1px;border-spacing:0;">
@@ -21,6 +21,10 @@ I've build this state of development with the following dependencies
     <td class="tg-031e">Keystone</td>
     <td class="tg-031e">4.0.0-beta.8</td>
   </tr>
+    <tr>
+    <td class="tg-031e">MongoDB</td>
+    <td class="tg-031e">3.6.2</td>
+  </tr>
   <tr>
     <td class="tg-031e">Underscore</td>
     <td class="tg-031e">1.8.3</td>
@@ -32,9 +36,5 @@ I've build this state of development with the following dependencies
   <tr>
     <td class="tg-031e">Soap-UI</td>
     <td class="tg-031e">5.4.0</td>
-  </tr>
-  <tr>
-    <td class="tg-031e">MongoDB</td>
-    <td class="tg-031e">3.6.2</td>
   </tr>
 </table>
