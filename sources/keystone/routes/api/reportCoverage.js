@@ -34,7 +34,7 @@ exports = module.exports = function (req, res) {
         reporter = new Reporter(config);
 
 
-    formats = ['json'];
+    formats = ['html'];
     reporter.addAll(formats);
 
     root = opts.root || process.cwd();

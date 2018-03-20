@@ -1,5 +1,7 @@
 # my own
 libs
+build
+updates
 
 # Coverage directory used by tools like istanbul
 *coverage*/
@@ -11,7 +13,6 @@ npm-debug.log*
 
 # Dependency directories
 node_modules/
-sources/keystone/node_modules/
 
 # NPM generated files
-source/keystone/package-lock.json
+package-lock.json

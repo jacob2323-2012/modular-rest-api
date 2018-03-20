@@ -43,9 +43,9 @@ keystone.set('hooksAreDisabled', false);
 // - printing trace property in internal server errors
 keystone.set('debug_mode', debugMode);
 
-keystone.import('models/locales/'+ locale);
-require('./models/base');
-keystone.import('models/definitions');
+keystone.import('build/keystone/models/locales/'+ locale);
+require('./build/keystone/models/base');
+keystone.import('build/keystone/models/definitions');
 
 
 
@@ -60,7 +60,7 @@ keystone.set('locals', {
   chartbeat_domain: keystone.get('chartbeat domain')
 });
 
-keystone.set('routes', require('./routes'));
+keystone.set('routes', require('./build/keystone/routes'));
 
 var Navigations = keystone.list('navigations');
 Navigations.model.applyYourselfToKeystoneNav();

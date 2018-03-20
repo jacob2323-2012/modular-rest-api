@@ -2,6 +2,7 @@ var keystone = require('keystone'),
     Types = keystone.Field.Types;
 
 var Navigations = new keystone.List('navigations', {
+    hidden: true
 }
 );
 

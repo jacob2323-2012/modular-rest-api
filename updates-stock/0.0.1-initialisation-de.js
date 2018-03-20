@@ -47,7 +47,7 @@ exports = module.exports = function (done) {
             __ref: 'user_guest'
         }, {
             name: { first: 'Beispielbenutzer', last: 'generell angemeldet' },
-            email: 'refuser.authenticated@test.de',
+            email: 'refuser.authenticated@dummydomain.de',
             password: 'refuser',
             canAccessKeystone: false,
             roles: ['roles_authenticated'],
