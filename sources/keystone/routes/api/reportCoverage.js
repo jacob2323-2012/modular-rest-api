@@ -1,9 +1,9 @@
 var keystone = require('keystone'),
+    Base = keystone.list('base'),
     istanbul = require('istanbul'),
     Report = istanbul.Report,
     Reporter = istanbul.Reporter,
     Collector = istanbul.Collector,
-    Base = keystone.list('base'),
     nopt = require('nopt'),
     path = require('path'),
     fs = require('fs'),
@@ -39,11 +39,22 @@ exports = module.exports = function (req, res) {
 
     root = opts.root || process.cwd();
 
-    collector.add(__coverage__);
-    reporter.write(collector, false, function (err) {
-        console.log('Done');
-        res.sendStatus(200);
-    });
-
-
+    try {
+        collector.add(__coverage__);
+        reporter.write(collector, false, function (err) {
+            return res.status(200).json(Base.model.structuredJsonResponse(true, [{
+                noOfCollectedFiles: collector.files().length
+              }]));
+        });
+    } catch (err) {
+        // When ___coverage___ is not defined most probably we do not run in mode coverage-test
+        if (err.name === "ReferenceError" && err.message.indexOf("__coverage__") > -1) {
+            return res.status(200).json(Base.model.structuredJsonResponse(true, [{
+                noOfCollectedFiles: 0
+              }]));
+        } else {
+            throw err;
+        }
+        
+    }
 };

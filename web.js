@@ -1,17 +1,23 @@
 var keystone = require('keystone');
-
-console.log(process.argv.slice(2));
-
 var argv = process.argv.slice(2);
-var debugMode = (argv.indexOf('--debug-mode') > -1);
-console.log("debug-mode: " +  debugMode);
 
+// Handle parameter "locale"
 var localeParamIndex = argv.indexOf('--locale');
 var locale = "de";
 if (localeParamIndex > -1) {
   locale = argv[localeParamIndex+1];
 }
 console.log("locale: " +  locale);
+
+// Handle parameter "mode"
+var modeParamIndex = argv.indexOf('--mode');
+var mode = "development";
+if (modeParamIndex > -1) {
+  mode = argv[modeParamIndex+1];
+}
+var debugMode = (mode === "development" || mode === "coverage-test")
+console.log("mode: " +  mode);
+console.log("debug-mode: " +  debugMode);
 
 keystone.init({
   'name': 'Modular REST-API',
