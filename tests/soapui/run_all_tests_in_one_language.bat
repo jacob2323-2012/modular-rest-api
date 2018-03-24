@@ -1,8 +1,8 @@
 @echo off
 
-SET TEST_DIR=%~dp0
-
 REM Define general settings
+SET TEST_DIR=%~dp0
+SET KEYSTONE_HOST_AND_PORT=localhost:3001
 SET BASE_DIR=%~dp0..\..\
 CALL %BASE_DIR%\config\environment.bat
 
@@ -15,7 +15,7 @@ IF "%LOCALE%"=="" (
 REM Handle param for BASE_LOG_DIR_NAME
 SET BASE_LOG_DIR_NAME=%~2
 IF "%BASE_LOG_DIR_NAME%"=="" (
-    SET BASE_LOG_DIR_NAME=logs\%MY_LOGDATETIME%\
+    SET BASE_LOG_DIR_NAME=logs\%ENV_LOGDATETIME%\
 )
 
 REM Relative base_dir for logs (given as well to Start.bat as base_log_dir)
@@ -33,13 +33,13 @@ SET TEST_DB_NAME=modular-rest-api_soapui
 call "C:\Program Files\MongoDB\Server\3.6\bin\mongo.exe" %TEST_DB_NAME% --eval "db.dropDatabase()"
 
 REM Start Keystone Server for test
-SET KEYSTONE_WINDOW_NAME="KeystoneJS-Server_%MY_LOGDATETIME%"
-Start %KEYSTONE_WINDOW_NAME% %BASE_DIR%start.bat %LOCALE% "coverage-test" "%TEST_DB_NAME%" "%~dp0%LOCALE_BASE_LOG_DIR_NAME%" 
+SET KEYSTONE_WINDOW_NAME="KeystoneJS-Server_%ENV_LOGDATETIME%"
+Start %KEYSTONE_WINDOW_NAME% %BASE_DIR%start.bat %LOCALE% "coverage-test" "%TEST_DB_NAME%" "%~dp0%LOCALE_BASE_LOG_DIR_NAME%" "%KEYSTONE_HOST_AND_PORT%"
 
 REM RUN the SOAP-UI tests
 SET PROJECT_FILE="%~dp0Basic-REST-CRUD-soapui-project.xml"
 cd %MY_LOGDIR%
-call "C:\Program Files (x86)\SmartBear\SoapUI-5.4.0\bin\testrunner.bat" -ehttp://localhost:3000 -r -j -J -f%MY_LOGDIR% %PROJECT_FILE% > %MY_LOGDIR%test_run.log
+call "C:\Program Files (x86)\SmartBear\SoapUI-5.4.0\bin\testrunner.bat" -ehttp://%KEYSTONE_HOST_AND_PORT% -r -j -J -f%MY_LOGDIR% %PROJECT_FILE% > %MY_LOGDIR%test_run.log
 cd %TEST_DIR%
 
 REM Create HTML out of soap-ui's junit results

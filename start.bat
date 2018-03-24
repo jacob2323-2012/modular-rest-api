@@ -24,7 +24,13 @@ IF "%MONGO_DB_NAME%"=="" (
 REM Handle param for BASE_LOG_DIR_NAME
 SET BASE_LOG_DIR_NAME=%~4
 IF "%BASE_LOG_DIR_NAME%"=="" (
-    SET BASE_LOG_DIR_NAME=logs\%MY_LOGDATETIME%\
+    SET BASE_LOG_DIR_NAME=logs\%ENV_LOGDATETIME%\
+)
+
+REM Handle param for HOST_AND_PORT
+SET HOST_AND_PORT=%~5
+IF "%HOST_AND_PORT%"=="" (
+    SET HOST_AND_PORT=localhost:3000
 )
 
 REM Define directory and files for Keystone-Logs
@@ -57,4 +63,4 @@ REM Calling custom start allows to inject custom start operations here
 IF EXIST "%~dp0custom_start.bat" CALL "%~dp0custom_start.bat"
 
 REM Start Keystone
-call node web --locale %LOCALE% --mode %MODE% --database %MONGO_DB_NAME% --log %BASE_LOG_DIR_NAME%> %MY_LOGFILE_OUT% 2>%MY_LOGFILE_ERR%
+call node web --locale %LOCALE% --mode %MODE% --database %MONGO_DB_NAME% --log %BASE_LOG_DIR_NAME% --server %HOST_AND_PORT%> %MY_LOGFILE_OUT% 2>%MY_LOGFILE_ERR%

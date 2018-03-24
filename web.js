@@ -33,7 +33,20 @@ var logDirName = "log\\";
 if (logParamIndex > -1) {
   logDirName = argv[logParamIndex+1];
 }
-console.log("logDirName: " +  logDirName);
+
+// Handle parameter "server" (host:port)
+var serverParamIndex = argv.indexOf('--server');
+var serverHostName = "localhost";
+var serverPort = "3000";
+if (serverParamIndex > -1) {
+  var serverParam = argv[serverParamIndex+1];
+  serverHostName = serverParam.split(':')[0];
+  serverPort = serverParam.split(':')[1];
+}
+console.log("serverHostName: " +  serverHostName);
+console.log("serverPort: " +  serverPort);
+
+
 
 keystone.init({
   'name': 'Modular REST-API',
@@ -42,6 +55,8 @@ keystone.init({
   'less': 'public',
   'static': ['public'],
 
+  'host': serverHostName,
+  'port': parseInt(serverPort),
   'views': 'templates/views',
   'view engine': 'jade',
 
