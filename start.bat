@@ -21,24 +21,14 @@ IF "%MONGO_DB_NAME%"=="" (
     SET MONGO_DB_NAME=modular-rest-api
 )
 
-REM Handle param for base_dir
-SET MY_BASE_DIR=%~4
-IF "%MY_BASE_DIR%"=="" (
-    SET MY_BASE_DIR=%BASE_DIR%
-)
-
 REM Handle param for BASE_LOG_DIR_NAME
-SET BASE_LOG_DIR_NAME=%~5
+SET BASE_LOG_DIR_NAME=%~4
 IF "%BASE_LOG_DIR_NAME%"=="" (
     SET BASE_LOG_DIR_NAME=logs\%MY_LOGDATETIME%\
 )
 
-
-
-
-
 REM Define directory and files for Keystone-Logs
-SET MY_LOGDIR=%MY_BASE_DIR%%BASE_LOG_DIR_NAME%
+SET MY_LOGDIR=%BASE_LOG_DIR_NAME%
 mkdir %MY_LOGDIR%
 SET MY_LOGFILE_OUT=%MY_LOGDIR%keystone_stdout.log
 SET MY_LOGFILE_ERR=%MY_LOGDIR%keystone_stderr.log
