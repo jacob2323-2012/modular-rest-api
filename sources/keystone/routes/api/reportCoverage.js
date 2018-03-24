@@ -31,10 +31,9 @@ exports = module.exports = function (req, res) {
                 dir: opts.dir
             }
         }),
-        reporter = new Reporter(config);
+        reporter = new Reporter(config, keystone.get('locals').logDirName + "coverage");
 
-
-    formats = ['html'];
+    formats = ['html','json'];
     reporter.addAll(formats);
 
     root = opts.root || process.cwd();

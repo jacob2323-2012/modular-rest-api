@@ -1,3 +1,8 @@
+REM Define general settings
+SET BASE_DIR=%~dp0
+CALL %BASE_DIR%\config\environment.bat
+cd %BASE_DIR%
+
 REM Handle param for locale (en, de)
 SET LOCALE=%~1
 IF "%LOCALE%"=="" (
@@ -10,17 +15,33 @@ IF "%MODE%"=="" (
     SET MODE=development
 )
 
-REM Define general settings
-SET SCRIPT_DIR=%~dp0
-CALL %SCRIPT_DIR%\config\environment.bat
+REM Handle param for log_base
+SET MONGO_DB_NAME=%~3
+IF "%MONGO_DB_NAME%"=="" (
+    SET MONGO_DB_NAME=modular-rest-api
+)
+
+REM Handle param for base_dir
+SET MY_BASE_DIR=%~4
+IF "%MY_BASE_DIR%"=="" (
+    SET MY_BASE_DIR=%BASE_DIR%
+)
+
+REM Handle param for BASE_LOG_DIR_NAME
+SET BASE_LOG_DIR_NAME=%~5
+IF "%BASE_LOG_DIR_NAME%"=="" (
+    SET BASE_LOG_DIR_NAME=logs\%MY_LOGDATETIME%\
+)
+
+
+
+
 
 REM Define directory and files for Keystone-Logs
-SET MY_LOGDIR=%SCRIPT_DIR%logs
+SET MY_LOGDIR=%MY_BASE_DIR%%BASE_LOG_DIR_NAME%
 mkdir %MY_LOGDIR%
-SET LOG_FILENAME_PREFIX_OUT=keystone_stdout_
-SET MY_LOGFILE_OUT=%MY_LOGDIR%\%LOG_FILENAME_PREFIX_OUT%%MY_LOGDATETIME%.log
-SET LOG_FILENAME_PREFIX_ERR=keystone_stderr_
-SET MY_LOGFILE_ERR=%MY_LOGDIR%\%LOG_FILENAME_PREFIX_ERR%%MY_LOGDATETIME%.log
+SET MY_LOGFILE_OUT=%MY_LOGDIR%keystone_stdout.log
+SET MY_LOGFILE_ERR=%MY_LOGDIR%keystone_stderr.log
 
 REM Create or clear build directory... 
 set BUILD_DIR=.\build
@@ -29,7 +50,7 @@ del /s /f /q %BUILD_DIR%\*.*
 for /f %%f in ('dir /ad /b %BUILD_DIR%\') do rd /s /q %BUILD_DIR%\%%f
 REM ... and fill it dependent on mode...
 IF "%MODE%"=="coverage-test" (
-    call node_modules\.bin\istanbul instrument .\sources -o %BUILD_DIR% -x **/reportCoverage.js -x **/locales/**
+    call node_modules\.bin\istanbul instrument .\sources -o %BUILD_DIR% -x **/reportCoverage.js -x
 )
 REM ...at last fill the gaps left by istanbul (no replacement of existing files)
 xcopy .\sources %BUILD_DIR% /S /D /Y
@@ -46,4 +67,4 @@ REM Calling custom start allows to inject custom start operations here
 IF EXIST "%~dp0custom_start.bat" CALL "%~dp0custom_start.bat"
 
 REM Start Keystone
-call node web --locale %LOCALE% --mode %MODE% > %MY_LOGFILE_OUT% 2>%MY_LOGFILE_ERR%
+call node web --locale %LOCALE% --mode %MODE% --database %MONGO_DB_NAME% --log %BASE_LOG_DIR_NAME%> %MY_LOGFILE_OUT% 2>%MY_LOGFILE_ERR%

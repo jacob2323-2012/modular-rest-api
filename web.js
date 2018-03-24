@@ -19,6 +19,22 @@ var debugMode = (mode === "development" || mode === "coverage-test")
 console.log("mode: " +  mode);
 console.log("debug-mode: " +  debugMode);
 
+// Handle parameter "database"
+var databaseParamIndex = argv.indexOf('--database');
+var database = "modular-rest-api";
+if (databaseParamIndex > -1) {
+  database = argv[databaseParamIndex+1];
+}
+console.log("database: " +  database);
+
+// Handle parameter "log"
+var logParamIndex = argv.indexOf('--log');
+var logDirName = "log\\";
+if (logParamIndex > -1) {
+  logDirName = argv[logParamIndex+1];
+}
+console.log("logDirName: " +  logDirName);
+
 keystone.init({
   'name': 'Modular REST-API',
 
@@ -30,7 +46,7 @@ keystone.init({
   'view engine': 'jade',
 
   'auto update': true,
-  'mongo': 'mongodb://localhost/modular-rest-api',
+  'mongo': 'mongodb://localhost/' + database,
 
   'session': true,
   'auth': true,
@@ -59,6 +75,7 @@ keystone.set('locals', {
   _: require('lodash'),
   env: keystone.get('env'),
   utils: keystone.utils,
+  logDirName: logDirName,
   editable: keystone.content.editable,
   ga_property: keystone.get('ga property'),
   ga_domain: keystone.get('ga domain'),
