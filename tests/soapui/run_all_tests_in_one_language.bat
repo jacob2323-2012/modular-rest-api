@@ -39,7 +39,7 @@ Start %KEYSTONE_WINDOW_NAME% %BASE_DIR%start.bat %LOCALE% "coverage-test" "%TEST
 REM RUN the SOAP-UI tests
 SET PROJECT_FILE="%~dp0Basic-REST-CRUD-soapui-project.xml"
 cd %MY_LOGDIR%
-call "C:\Program Files (x86)\SmartBear\SoapUI-5.4.0\bin\testrunner.bat" -ehttp://%KEYSTONE_HOST_AND_PORT% -r -j -J -f%MY_LOGDIR% %PROJECT_FILE% > %MY_LOGDIR%test_run.log
+call "C:\Program Files (x86)\SmartBear\SoapUI-5.4.0\bin\testrunner.bat" -ehttp://%KEYSTONE_HOST_AND_PORT% -r -j -f%MY_LOGDIR% %PROJECT_FILE% > %MY_LOGDIR%test_run.log
 cd %TEST_DIR%
 
 REM Create HTML out of soap-ui's junit results
