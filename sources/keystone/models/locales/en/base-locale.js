@@ -16,7 +16,8 @@ keystone.set('baseLocalisations', {
         unknown_keystone_list: "The requested list '{0}' is unknown.",
         request_failed_due_to_internal_error: "The request failed due to an internal server problem (ID: {0}).",
         no_records_for_id: "No record found for ID '{0}'.",
-        not_allowed_to_delete_all_records_at_once: "Refuse to delete all records at once. ID must be given to delete a single record."
+        not_allowed_to_delete_all_records_at_once: "Refuse to delete all records at once. ID must be given to delete a single record.",
+        not_allowed_to_update_all_records_at_once: "Refuse to update all records at once. ID must be given to update a single record."
     }
 });
 

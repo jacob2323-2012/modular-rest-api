@@ -2,6 +2,7 @@
 libs
 build
 updates
+backup
 
 # Coverage directory used by tools like istanbul
 *coverage*/

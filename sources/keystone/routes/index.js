@@ -38,5 +38,7 @@ exports = module.exports = function (app) {
 
     app.get('\/rest\/all\/*', routes.rest.getall);
 
+    app.patch('\/rest\/all\/*', routes.rest.patchall);
+
     app.delete('\/rest\/all\/*', routes.rest.deleteall);
 }
