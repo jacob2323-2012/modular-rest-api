@@ -40,12 +40,6 @@ exports = module.exports = function (done) {
             roles: ['roles_admin'],
             __ref: 'user_admin'
         }, {
-            name: { first: 'ReUser', last: 'Guest' },
-            email: 'refuser.guest@dummydomain.de',
-            password: 'refuser',
-            canAccessKeystone: false,
-            __ref: 'user_guest'
-        }, {
             name: { first: 'ReUser', last: 'Authenticated' },
             email: 'refuser.authenticated@dummydomain.de',
             password: 'refuser',

@@ -105,7 +105,7 @@ Users.schema.method('isTheOnlyAdmin', function (isTheOnlyAdminCallback) {
 Users.schema.method('checkKeystoneAccess', function (done) {
     var me = this;
 
-    // if user was changes, we check whether the access to
+    // if user was changed, we check whether the access to
     // the admin-ui was effected.
     me.isAdmin(function (isAdmin) {
         me.canAccessKeystone = isAdmin;
@@ -122,7 +122,6 @@ Users.schema.pre('save', true, function (next, done) {
         done();
     } else {
         var me = this;
-        var messages = texts.messages;
         next();
         me.isTheOnlyAdmin(function (isTheOnlyAdmin) {
             if (isTheOnlyAdmin) {
@@ -131,17 +130,18 @@ Users.schema.pre('save', true, function (next, done) {
                     .where('_id')
                     .in(me.roles)
                     .exec(function (err, connectedRoles) {
-                        var hasAdminRole = false;
+                        var stillHasAdminRole = false;
                         for (var i = 0; i < connectedRoles.length; i++) {
                             var iRole = connectedRoles[i];
 
+                            // if there was a role deleted which is not 
+                            // the admin-role we have no problem.
                             if (iRole.isAdminRole) {
-                                hasAdminRole = true;
+                                stillHasAdminRole = true;
                             }
                         }
-                        if (!hasAdminRole) {
-                            var msg = me.model.formatString(messages.cannot_drop_role_of_last_remaining_admin);
-                            done(new Error(msg));
+                        if (!stillHasAdminRole) {
+                            done(Users.model.createCustomError(Users, "cannot_drop_role_of_last_remaining_admin"));
                         } else {
                             // in case of success check to switch access to admin-ui
                             me.checkKeystoneAccess(done);

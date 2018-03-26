@@ -39,12 +39,6 @@ exports = module.exports = function (done) {
             canAccessKeystone: true,
             roles: ['roles_admin'],
             __ref: 'user_admin'
-        },{
-            name: { first: 'Beispielbenutzer', last: 'Gast' },
-            email: 'refuser.guest@dummydomain.de',
-            password: 'refuser',
-            canAccessKeystone: false,
-            __ref: 'user_guest'
         }, {
             name: { first: 'Beispielbenutzer', last: 'generell angemeldet' },
             email: 'refuser.authenticated@dummydomain.de',
