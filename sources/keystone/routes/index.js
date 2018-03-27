@@ -36,6 +36,8 @@ exports = module.exports = function (app) {
         app.post('/api/report', routes.api.reportCoverage);
     }
 
+    app.post('\/rest\/all\/*', routes.rest.createall);
+
     app.get('\/rest\/all\/*', routes.rest.getall);
 
     app.patch('\/rest\/all\/*', routes.rest.patchall);

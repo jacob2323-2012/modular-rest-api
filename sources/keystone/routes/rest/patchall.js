@@ -49,7 +49,7 @@ exports = module.exports = function (req, res) {
 												throw new Error("Unexpected problem while requesting one " + aListName + ". " + err2);
 											}
 										} else {
-											res.status(200).json(Base.model.structuredJsonResponse(true, record));
+											res.status(200).json(Base.model.structuredJsonResponse(true, [record]));
 										}
 									});
 								} else {
