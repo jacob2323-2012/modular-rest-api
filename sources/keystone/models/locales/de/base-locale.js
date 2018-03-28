@@ -17,7 +17,11 @@ keystone.set('baseLocalisations', {
         request_failed_due_to_internal_error: "Die Anfrage schlug wegen eines internen Problems des Servers fehl (ID: {0}).",
         no_records_for_id: "Für die ID '{0}' wurde kein Datensatz gefunden.",
         not_allowed_to_delete_all_records_at_once: "Es ist nicht erlaubt alle Datensätze auf ein Mal zu löschen. Es muss die ID des zu löschenden Datensatzes angegeben werden.",
-        not_allowed_to_update_all_records_at_once: "Es ist nicht erlaubt alle Datensätze auf ein Mal zu aktualisieren. Es muss die ID des Datensatzes angegeben werden, welche aktualisiert werden soll."
+        not_allowed_to_update_all_records_at_once: "Es ist nicht erlaubt alle Datensätze auf ein Mal zu aktualisieren. Es muss die ID des Datensatzes angegeben werden, welche aktualisiert werden soll.",
+        duplicate_key_error: "Für die Liste '{0}' existiert bereits ein Datensatz mit dem angegebenen Schlüssel.",
+        validation_error_required: "Das Attribut '{0}' ist ein Pflichfeld und muss angegeben werden.",
+        validation_error_invalid: "Der Wert für das Attribut '{0}' ist ungültig."
+        
     }
 });
 

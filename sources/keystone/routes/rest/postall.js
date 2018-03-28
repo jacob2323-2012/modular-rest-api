@@ -19,20 +19,13 @@ exports = module.exports = function (req, res) {
 				if (httpResultCode !== 200) {
 					res.sendStatus(httpResultCode);
 				} else {
-					var record = new aCollection.model(req.body);
-					record.save(function (err) {
-						// post has been saved	
+					var record = new aCollection.model();
+					aCollection.updateItem(record, req.body, {
+						ignoreNoEdit: true,
+						user: req.user,
+					}, function (err) {
 						if (err) {
-							if (err.custom) {
-								res.status(400).json(Base.model.structuredJsonResponse(false,
-									Base.model.structuredErrorObjects(aCollection, [err])
-								));
-							} else {
-								// we need to output the error response here, because Mongoose model will encapsulate
-								// the error so that we cannot react in error handling in middleware
-								Base.model.outputInternalError(err, req, res);
-								throw new Error("Unexpected problem while requesting one " + aListName + " for POST. " + err);
-							}
+							Base.model.handleUpdateItemErrors(aCollection, err, req, res);
 						} else {
 							res.status(200).json(Base.model.structuredJsonResponse(true, [record]));
 						}

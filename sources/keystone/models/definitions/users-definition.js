@@ -24,7 +24,7 @@ var fl = texts.fieldLabels;
 Users.add({
     name: Object.assign(fl.name, { type: Types.Name, required: true, index: true }),
     email: Object.assign(fl.email, { type: Types.Email, initial: true, required: true, index: true }),
-    password: Object.assign(fl.password, { type: Types.Password, initial: true }),
+    password: Object.assign(fl.password, { type: Types.Password, initial: true, required: true }),
     roles: Object.assign(fl.roles, { type: Types.Relationship, ref: 'roles', initial: true, required: true, many: true, filters: { isGuestRole: 'false' } }),
     canAccessKeystone: Object.assign(fl.canAccessKeystone, { type: Boolean, hidden: true })
 });

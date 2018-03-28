@@ -33,21 +33,9 @@ exports = module.exports = function (req, res) {
 								throw new Error("Unexpected Problem while requesting one " + aListName + " for PATCH. Error: " + err);
 							} else {
 								if (record) {
-									aCollection.updateItem(record, req.body, {}, function (err2) {
+									aCollection.updateItem(record, req.body, { user: req.user }, function (err2) {
 										if (err2) {
-											console.log('err2:');
-											console.log(err2.detail.custom);
-
-											if (err2.detail.custom) {
-												res.status(400).json(Base.model.structuredJsonResponse(false,
-													Base.model.structuredErrorObjects(aCollection, [{ id: err2.detail.id, args: [err2.detail.args] }])
-												));
-											} else {
-												// we need to output the error response here, because Mongoose model will encapsulate
-												// the error so that we cannot react in error handling in middleware
-												Base.model.outputInternalError(err2, req, res);
-												throw new Error("Unexpected problem while requesting one " + aListName + ". " + err2);
-											}
+											Base.model.handleUpdateItemErrors(aCollection, err2, req, res);
 										} else {
 											res.status(200).json(Base.model.structuredJsonResponse(true, [record]));
 										}

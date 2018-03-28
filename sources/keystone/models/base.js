@@ -1,6 +1,6 @@
 var keystone = require('keystone');
 
-const LOCALISATION_KEY = 'baseLocalisations'; 
+const LOCALISATION_KEY = 'baseLocalisations';
 
 var Base = new keystone.List('base', {
     hidden: true
@@ -197,12 +197,23 @@ Base.schema.static('structuredErrorObjects', function (list, errorDetails) {
             });
         } else {
             if (errorDetails[i].id) {
-                var anErrId = errorDetails[i].id;
-                var errorArgs = errorDetails[i].args || [];
-                var errorObj = {
-                    errorId: anErrId,
-                    errorMsg: msgs && msgs[anErrId] ? Base.model.formatString(msgs[anErrId], errorArgs) : anErrId
-                };
+                var iErrDetail = errorDetails[i];
+                
+                // keep id and args (to build the message out of it)
+                // and delete them from the object
+                var anErrId = iErrDetail.id;
+                var errorArgs = iErrDetail.args || [];
+                delete iErrDetail.id;
+                delete iErrDetail.args;
+
+                // keep all other properties in the result object
+                var errorObj = iErrDetail;
+
+                // build the localised message
+                errorObj.errorId = anErrId;
+                errorObj.errorMsg = msgs && msgs[anErrId] ? Base.model.formatString(msgs[anErrId], errorArgs) : anErrId;
+
+                // add trace, when debug-mode
                 var debug_mode = keystone.get('debug_mode');
                 if (debug_mode) {
                     errorObj.trace = errorDetails[i].trace || undefined;
@@ -239,6 +250,60 @@ Base.schema.static('createCustomError', function (list, errorId, args) {
     anErr.id = errorId
     anErr.args = args;
     return anErr;
+});
+
+/**
+ * Treat different kinds of errors which may occur when saving or updating a record
+ * using list.updateItem().
+ */
+Base.schema.static('handleUpdateItemErrors', function (collection, err, req, res) {
+    if (err.error === 'validation errors' && err.detail) {
+        var errors = [];
+        var aValidationBaseKey = "validation_error_";
+
+        // there can be multiple validation errors
+        // when attempting to save
+        for (var key in err.detail) {
+            var iError = err.detail[key];
+            errors.push({
+                // id is dependent on type
+                id: aValidationBaseKey + iError.type,
+
+                // extract args for building the message string
+                args: [iError.fieldLabel],
+
+                // keep other  information
+                path: key,
+                fieldType: iError.fieldType,
+                fieldLabel: iError.fieldLabel,
+                origMessage: iError.error
+            });
+        }
+        res.status(400).json(Base.model.structuredJsonResponse(false,
+            Base.model.structuredErrorObjects(Base, errors)
+        ));
+
+    }
+
+    else if (err.error === 'database error' && err.detail) {
+        if (err.detail.custom) {
+            res.status(400).json(Base.model.structuredJsonResponse(false,
+                Base.model.structuredErrorObjects(collection, [err.detail])
+            ));
+        } else if (err.detail.code === 11000) {
+            res.status(400).json(Base.model.structuredJsonResponse(false,
+                Base.model.structuredErrorObjects(Base, [{ id: "duplicate_key_error", args: [collection.key] }])
+            ));
+        } else {
+            Base.model.outputInternalError(err, req, res);
+        }
+    }
+    else {
+        // we need to output the error response here, because Mongoose model will encapsulate
+        // the error so that we cannot react in error handling in middleware
+        Base.model.outputInternalError(err, req, res);
+        //throw new Error("Unexpected problem while requesting one " + aListName + " for POST. " + err);
+    }
 });
 
 

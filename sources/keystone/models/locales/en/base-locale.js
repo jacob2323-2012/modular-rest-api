@@ -17,7 +17,10 @@ keystone.set('baseLocalisations', {
         request_failed_due_to_internal_error: "The request failed due to an internal server problem (ID: {0}).",
         no_records_for_id: "No record found for ID '{0}'.",
         not_allowed_to_delete_all_records_at_once: "Refuse to delete all records at once. ID must be given to delete a single record.",
-        not_allowed_to_update_all_records_at_once: "Refuse to update all records at once. ID must be given to update a single record."
+        not_allowed_to_update_all_records_at_once: "Refuse to update all records at once. ID must be given to update a single record.",
+        duplicate_key_error: "The given key is already existing for list '{0}'.",
+        validation_error_required: "The attribute '{0}' is required.",
+        validation_error_invalid: "The value for attribute '{0}' is invalid."
     }
 });
 
