@@ -29,7 +29,7 @@ Roles.add({
 });
 Roles.relationship({ path: 'usersWithRole', refPath: 'roles', ref: 'users' });
 Roles.relationship({ path: 'permissionWithRole', refPath: 'roles', ref: 'permissions' });
-Roles.defaultColumns = 'name|15%, description';
+Roles.defaultColumns = 'name|25%, description';
 
 // central method to detect records for /rest/my/...
 Roles.schema.static('findMine', function (pUserId, pId, pCallback) {

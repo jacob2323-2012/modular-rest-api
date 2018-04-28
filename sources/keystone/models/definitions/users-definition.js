@@ -1,6 +1,8 @@
 var keystone = require('keystone'),
     Types = keystone.Field.Types,
-    Base = keystone.list('base');
+    Base = keystone.list('base'),
+    utils = require('keystone-utils'),
+    displayName = require('display-name');
 
 const LOCALISATION_KEY = 'usersLocalisations';
 
@@ -29,6 +31,152 @@ Users.add({
     canAccessKeystone: Object.assign(fl.canAccessKeystone, { type: Boolean, hidden: true })
 });
 Users.defaultColumns = 'name, email, roles';
+
+var errMsgs = texts.errorMessages;
+
+/**
+ * Overwrite validation of field "email".
+ */
+var superEmailValidateInput = Users.fields.email.validateInput;
+Users.fields.email.validateInput = function (data, callback) {
+    var value = this.getValueFromData(data);
+
+    if (!value) {
+        return utils.defer(callback, true);
+    }
+
+    var myCallback = function (preResult, preMesssage) {
+
+        // custom rule before result from super is processed
+        if (value.length < 5) {
+            utils.defer(callback, false, errMsgs.eMail_to_short);
+        } else {
+
+            // custom rule after result from super is processed
+            if (preResult) {
+                if (value.length <= 25) {
+                    utils.defer(callback, true);
+                } else {
+                    utils.defer(callback, false, errMsgs.eMail_to_long);
+                }
+            } else {
+
+                // build-in validation has failed
+                utils.defer(callback, false, preMesssage);
+            }
+        }
+
+
+    };
+    superEmailValidateInput.call(this, data, myCallback);
+};
+
+/**
+ * Overwrite validation of field "name".
+ */
+var superNameValidateInput = Users.fields.name.validateInput;
+Users.fields.name.validateInput = function (data, callback) {
+    var value = Users.fields.name.getInputFromData(data);
+
+    if (!value) {
+        return utils.defer(callback, true);
+    }
+
+    var name;
+    var myCallback = function (preResult, preMesssage) {
+
+        if (preResult) {
+
+            // name can come as an object with first- and lastname
+            if (typeof value === "object") {
+                name = displayName(value.first, value.last);
+            } else {
+                name = value;
+            }
+
+            // remove white spaces
+            name = name.replace(/\s/g, "");
+
+            if (name.length < 3) {
+                utils.defer(callback, false, errMsgs.name_to_short);
+            } else {
+                utils.defer(callback, true);
+            }
+
+        } else {
+
+            // build-in validation has failed
+            utils.defer(callback, false, preMesssage);
+        }
+    };
+
+    superNameValidateInput.call(this, data, myCallback);
+};
+
+/**
+ * Overwrite validation of field "roles".
+ */
+Users.fields.roles.validateInput = function (data, callback) {
+    var value = this.getValueFromData(data);
+
+    var tester = function (pIdArray, pListName, pFilters, pCallback) {
+        var anId = pIdArray.pop();
+        var aList = keystone.list(pListName);
+
+        aList.model.find()
+            .where("_id", anId)
+            .exec(function (err, records) {
+
+                // CastError most probably is when ID does not exist
+                if (err) {
+                    if (err.name === "CastError") {
+
+                        // we need to output the error response here, because Mongoose model will encapsulate
+                        // the error so that we cannot react in error handling in middleware
+                        utils.defer(pCallback, false, "CastError for id:'" + anId + "'");
+                    } else {
+                        utils.defer(pCallback, false, "Unexpected problem while checking record for id:" + anId + ". Error: " + err);
+                    }
+                } else {
+                    if (records && records.length > 0) {
+                        var passedFilter = true;
+                        var strFilterCondition;
+                        for (var key in pFilters) {
+                            strFilterCondition = key + " = " + pFilters[key];
+                            if (records[0][key] + "" !== pFilters[key] + "") {
+                                passedFilter = false;
+                                break;
+                            }
+                        }
+                        if (passedFilter) {
+                            if (pIdArray.length > 0) {
+                                tester(pIdArray, pListName, pFilters, pCallback)
+                            } else {
+                                utils.defer(pCallback, true);
+                            }
+                        } else {
+                            utils.defer(pCallback, false, Base.model.formatString(errMsgs.guest_role_not_allowed));
+                        }
+
+                    } else {
+                        utils.defer(pCallback, false, Base.model.formatString(errMsgs.no_record_found_for_id, pListName, anId));
+                    }
+                }
+
+            });
+    }
+
+    if (value) {
+        var ids = value.split(',');
+        var listName = Users.fields.roles.options.ref;
+        var filters = Users.fields.roles.options.filters;
+
+        tester(ids, listName, filters, callback);
+    } else {
+        utils.defer(callback, true);
+    }
+
+};
 
 Users.schema.path('roles').set(function (newVal) {
 
