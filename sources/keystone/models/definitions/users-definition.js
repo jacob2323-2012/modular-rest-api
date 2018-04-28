@@ -36,6 +36,9 @@ var errMsgs = texts.errorMessages;
 
 /**
  * Overwrite validation of field "email".
+ * 
+ * Checks whether the email is to short or to long.
+ * In between the validation of super is called.
  */
 var superEmailValidateInput = Users.fields.email.validateInput;
 Users.fields.email.validateInput = function (data, callback) {
@@ -51,19 +54,21 @@ Users.fields.email.validateInput = function (data, callback) {
         if (value.length < 5) {
             utils.defer(callback, false, errMsgs.eMail_to_short);
         } else {
+            
+            if (!preResult) {
+
+                // build-in validation has failed
+                utils.defer(callback, false, preMesssage);
+            } 
 
             // custom rule after result from super is processed
-            if (preResult) {
+            else {
                 if (value.length <= 25) {
                     utils.defer(callback, true);
                 } else {
                     utils.defer(callback, false, errMsgs.eMail_to_long);
                 }
-            } else {
-
-                // build-in validation has failed
-                utils.defer(callback, false, preMesssage);
-            }
+            } 
         }
 
 
@@ -73,6 +78,10 @@ Users.fields.email.validateInput = function (data, callback) {
 
 /**
  * Overwrite validation of field "name".
+ * 
+ * Checks whether the name is to short.
+ * The validatior can handle name="xyz" and the
+ * displayname out of {first: "xyz", last: "abc"}.
  */
 var superNameValidateInput = Users.fields.name.validateInput;
 Users.fields.name.validateInput = function (data, callback) {
@@ -85,7 +94,12 @@ Users.fields.name.validateInput = function (data, callback) {
     var name;
     var myCallback = function (preResult, preMesssage) {
 
-        if (preResult) {
+        if (!preResult) {
+
+            // build-in validation has failed
+            utils.defer(callback, false, preMesssage);
+        } 
+        else {
 
             // name can come as an object with first- and lastname
             if (typeof value === "object") {
@@ -102,12 +116,7 @@ Users.fields.name.validateInput = function (data, callback) {
             } else {
                 utils.defer(callback, true);
             }
-
-        } else {
-
-            // build-in validation has failed
-            utils.defer(callback, false, preMesssage);
-        }
+        } 
     };
 
     superNameValidateInput.call(this, data, myCallback);
@@ -115,67 +124,93 @@ Users.fields.name.validateInput = function (data, callback) {
 
 /**
  * Overwrite validation of field "roles".
+ * 
+ * Checks whether the is a joined record existing for the given ID.
+ * It checks as well whether the guest-role is taken.
+ * The validator can handle a list of IDs or a single ID.
  */
+var superRolesValidateInput = Users.fields.roles.validateInput;
 Users.fields.roles.validateInput = function (data, callback) {
     var value = this.getValueFromData(data);
 
-    var tester = function (pIdArray, pListName, pFilters, pCallback) {
-        var anId = pIdArray.pop();
-        var aList = keystone.list(pListName);
+    if (!value) {
+        return utils.defer(callback, true);
+    }
 
-        aList.model.find()
-            .where("_id", anId)
-            .exec(function (err, records) {
+    var myCallback = function (preResult, preMesssage) {
 
-                // CastError most probably is when ID does not exist
-                if (err) {
-                    if (err.name === "CastError") {
+        if (!preResult) {
 
-                        // we need to output the error response here, because Mongoose model will encapsulate
-                        // the error so that we cannot react in error handling in middleware
-                        utils.defer(pCallback, false, "CastError for id:'" + anId + "'");
-                    } else {
-                        utils.defer(pCallback, false, "Unexpected problem while checking record for id:" + anId + ". Error: " + err);
-                    }
-                } else {
-                    if (records && records.length > 0) {
-                        var passedFilter = true;
-                        var strFilterCondition;
-                        for (var key in pFilters) {
-                            strFilterCondition = key + " = " + pFilters[key];
-                            if (records[0][key] + "" !== pFilters[key] + "") {
-                                passedFilter = false;
-                                break;
-                            }
-                        }
-                        if (passedFilter) {
-                            if (pIdArray.length > 0) {
-                                tester(pIdArray, pListName, pFilters, pCallback)
+            // build-in validation has failed
+            utils.defer(callback, false, preMesssage);
+        }
+
+        else {
+            var tester = function (pIdArray, pListName, pFilters, pCallback) {
+                var aList = keystone.list(pListName);
+
+                // Reduce the ID-List to use it for recursive call below.
+                var anId = pIdArray.pop();
+
+                aList.model.find()
+                    .where("_id", anId)
+                    .exec(function (err, records) {
+
+                        // CastError most probably is when ID does not exist
+                        if (err) {
+                            if (err.name === "CastError") {
+
+                                // we need to output the error response here, because Mongoose model will encapsulate
+                                // the error so that we cannot react in error handling in middleware
+                                utils.defer(pCallback, false, "CastError for id:'" + anId + "'");
                             } else {
-                                utils.defer(pCallback, true);
+                                utils.defer(pCallback, false, "Unexpected problem while checking record for id:" + anId + ". Error: " + err);
                             }
                         } else {
-                            utils.defer(pCallback, false, Base.model.formatString(errMsgs.guest_role_not_allowed));
+                            if (records && records.length > 0) {
+                                var passedFilter = true;
+                                var strFilterCondition;
+
+                                // For users we have only a filter on isGuestRole: 'false'
+                                // But we have chosen here a generic approach in case filter changes
+                                // TODO: Move this treatment to keystone code.
+                                for (var key in pFilters) {
+                                    strFilterCondition = key + " = " + pFilters[key];
+                                    if (records[0][key] + "" !== pFilters[key] + "") {
+                                        passedFilter = false;
+                                        break;
+                                    }
+                                }
+                                if (passedFilter) {
+                                    if (pIdArray.length > 0) {
+
+                                        // If the filter was passed and there is more than one
+                                        // ID to test, we call the test-method recursive. 
+                                        // ID-List was reduced above.
+                                        tester(pIdArray, pListName, pFilters, pCallback)
+                                    } else {
+                                        utils.defer(pCallback, true);
+                                    }
+                                } else {
+                                    utils.defer(pCallback, false, Base.model.formatString(errMsgs.guest_role_not_allowed));
+                                }
+
+                            } else {
+                                utils.defer(pCallback, false, Base.model.formatString(errMsgs.no_record_found_for_id, pListName, anId));
+                            }
                         }
 
-                    } else {
-                        utils.defer(pCallback, false, Base.model.formatString(errMsgs.no_record_found_for_id, pListName, anId));
-                    }
-                }
+                    });
+            }
 
-            });
+            var ids = value.split(',');
+            var listName = Users.fields.roles.options.ref;
+            var filters = Users.fields.roles.options.filters;
+            tester(ids, listName, filters, callback);
+        }
     }
 
-    if (value) {
-        var ids = value.split(',');
-        var listName = Users.fields.roles.options.ref;
-        var filters = Users.fields.roles.options.filters;
-
-        tester(ids, listName, filters, callback);
-    } else {
-        utils.defer(callback, true);
-    }
-
+    superRolesValidateInput.call(this, data, myCallback);
 };
 
 Users.schema.path('roles').set(function (newVal) {
