@@ -86,8 +86,22 @@ Users.fields.email.validateInput = function (data, callback) {
 var superNameValidateInput = Users.fields.name.validateInput;
 Users.fields.name.validateInput = function (data, callback) {
     var value = Users.fields.name.getInputFromData(data);
+    var name;
 
     if (!value) {
+        return utils.defer(callback, true);
+    }
+   
+    // name can come as an object with first- and lastname
+    if (typeof value === "object") {
+        name = displayName(value.first, value.last);
+    } else {
+        name = value;
+    }
+
+    // Recognize "empty value" in case 
+    // it was provided as first- and lastname
+    if (!name || name.length === 0) {
         return utils.defer(callback, true);
     }
 
@@ -100,13 +114,6 @@ Users.fields.name.validateInput = function (data, callback) {
             utils.defer(callback, false, preMesssage);
         } 
         else {
-
-            // name can come as an object with first- and lastname
-            if (typeof value === "object") {
-                name = displayName(value.first, value.last);
-            } else {
-                name = value;
-            }
 
             // remove white spaces
             name = name.replace(/\s/g, "");
