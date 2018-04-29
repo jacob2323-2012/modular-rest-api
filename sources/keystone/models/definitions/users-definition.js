@@ -203,7 +203,7 @@ Users.fields.roles.validateInput = function (data, callback) {
                                 }
 
                             } else {
-                                utils.defer(pCallback, false, Base.model.formatString(errMsgs.no_record_found_for_id, pListName, anId));
+                                utils.defer(pCallback, false, Base.model.formatString(errMsgs.no_record_found_for_id, [pListName, anId]));
                             }
                         }
 
