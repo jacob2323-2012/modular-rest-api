@@ -63,7 +63,7 @@ Users.fields.email.validateInput = function (data, callback) {
 
             // custom rule after result from super is processed
             else {
-                if (value.length <= 25) {
+                if (value.length <= 38) {
                     utils.defer(callback, true);
                 } else {
                     utils.defer(callback, false, errMsgs.eMail_to_long);
