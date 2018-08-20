@@ -5,7 +5,7 @@
 
 
 ## Dependencies
-I've built this state of development with the following dependencies
+I've built this state of development with the following dependencies:
 
 
 <table style="border-style:solid;border-width:1px;border-spacing:0;">
